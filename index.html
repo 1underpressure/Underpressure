@@ -1,10 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>UnderPressure Challenge Generator</title>
   <style>
     html, body {
@@ -14,11 +12,8 @@
       width: 100%;
       position: fixed;
       touch-action: manipulation;
-
       margin: 0;
       padding: 0;
-      height: 100%;
-      width: 100%;
       font-family: 'Courier New', Courier, monospace;
       background: black url('100.gif') no-repeat center center fixed;
       background-size: cover;
@@ -28,14 +23,10 @@
       max-width: 90vw;
       width: 400px;
       padding: 25px 35px;
-      height: auto;
-
+      color: #fff;
       background: rgba(0, 0, 0, 0.75);
       border: 2px solid #ccc;
       border-radius: 15px;
-      padding: 20px 30px;
-      width: 350px;
-      color: #fff;
       box-shadow: 0 0 30px #222;
       position: absolute;
       top: 50%;
@@ -93,14 +84,24 @@
         "Reverse one part of your drum pattern.",
         "No hi-hats — use texture instead.",
         "Mute your kick for one bar mid-beat.",
-        "Switch snare placement every 2 bars."
+        "Switch snare placement every 2 bars.",
+        "Add vinyl crackle or tape hiss as a percussion layer.",
+        "Use only one-shots and no loops.",
+        "Make your drums mimic a heartbeat.",
+        "Create tension with pause-and-drop moments.",
+        "Use delay instead of reverb on all drum elements."
       ],
       advanced: [
         "Design a fill using only foley.",
         "Use 2 different 808s in one pattern.",
         "Create a groove with no kicks.",
         "Start the beat with a reversed clap.",
-        "Use only acoustic one-shots for drums."
+        "Use only acoustic one-shots for drums.",
+        "Add swing by misaligning your hi-hats.",
+        "Use bitcrushing on only one element.",
+        "Record a live object tap as your main snare.",
+        "Make the snare ghost notes the emotional driver.",
+        "Pan every element manually to emulate a real room."
       ]
     };
 
@@ -110,22 +111,31 @@
         "Only use one pad for your entire melody.",
         "Make a melody with just 4 notes total.",
         "Create a melody that loops endlessly.",
-        "Use only one-shots to make your loop."
+        "Use only one-shots to make your loop.",
+        "Draw your melody with only white keys.",
+        "Create a melody that gets quieter every 2 bars.",
+        "Layer your lead with a reversed version of itself.",
+        "Start your melody with a long note then stabs.",
+        "Only use bell or mallet sounds."
       ],
       advanced: [
         "Create a melody that hides fear or longing.",
         "Use automation to evolve a single tone.",
         "Use two different scales in one loop.",
         "Write a melody with different sounds per note.",
-        "Use dissonance, then resolve subtly."
+        "Use dissonance, then resolve subtly.",
+        "Turn random ambiance into harmony.",
+        "Use velocity to imply emotion like regret.",
+        "Write a melody backwards and flip it.",
+        "Make your chords ambiguous (no root).",
+        "Use silence to make notes more meaningful."
       ]
     };
 
     let mode = "beginner";
-
     let usedDrum = [], usedMelody = [];
 
-    function getUniquePrompt(set, used, label) {
+    function getUniquePrompt(set, used) {
       if (used.length === set.length) used.length = 0;
       let choice;
       do {
@@ -135,10 +145,9 @@
       return choice;
     }
 
-
     function roll() {
-      const drum = drumPrompts[mode][Math.floor(Math.random() * drumPrompts[mode].length)];
-      const melody = melodyPrompts[mode][Math.floor(Math.random() * melodyPrompts[mode].length)];
+      const drum = getUniquePrompt(drumPrompts[mode], usedDrum);
+      const melody = getUniquePrompt(melodyPrompts[mode], usedMelody);
 
       document.getElementById("drumPrompt").textContent = "🥁 " + drum;
       document.getElementById("melodyPrompt").textContent = "🎹 " + melody;
