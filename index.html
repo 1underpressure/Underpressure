@@ -1,53 +1,170 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Blessed Generator 3D</title>
+  <meta charset="UTF-8">
+  <title>UnderPressure 3D Challenge Generator</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <style>
     body {
       margin: 0;
-      background-color: black;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Courier New', Courier, monospace;
+      background: black;
     }
+
     model-viewer {
       width: 100vw;
       height: 100vh;
       position: absolute;
+      top: 0; left: 0;
       z-index: 0;
     }
-    #overlay {
-      position: relative;
-      z-index: 1;
-      color: white;
-      font-family: monospace;
-      background: rgba(0, 0, 0, 0.4);
+
+    .ui-overlay {
+      top: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
       padding: 20px;
+      background: rgba(0,0,0,0.75);
+      border: 2px solid #ccc;
       border-radius: 12px;
+      box-shadow: 0 0 30px #222;
+      z-index: 1;
+      text-align: center;
+      color: white;
+    }
+
+    button {
+      background: #111;
+      border: 1px solid #666;
+      padding: 6px 16px;
+      border-radius: 6px;
+      color: #ccc;
+      font-size: 0.8em;
+      margin: 10px 5px 0;
+      cursor: pointer;
+    }
+
+    .prompt {
+      margin: 10px 0;
+      font-size: 0.9em;
+    }
+
+    h1 {
+      font-size: 1.1em;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
+  <model-viewer src="Lowpoly_Notebook_2.glb" camera-orbit="0deg 75deg 1.5m" field-of-view="30deg" alt="3D Laptop"
+                auto-rotate camera-controls disable-zoom
+                exposure="1" environment-image="neutral" shadow-intensity="1">
+  </model-viewer>
 
-<model-viewer src="Lowpoly_Notebook_2.glb"
-              alt="3D Laptop"
-              auto-rotate
-              camera-controls
-              exposure="0.9"
-              shadow-intensity="1"
-              ar
-              autoplay>
-</model-viewer>
+  <div class="ui-overlay">
+    <h1>🎲 UnderPressure Generator</h1>
+    <div class="prompt" id="drumPrompt">🥁 Reverse one part of your drum pattern.</div>
+    <div class="prompt" id="melodyPrompt">🎹 Create a 3-chord loop that feels like giving up.</div>
+    <button onclick="roll()">Roll Dice</button>
+    <button onclick="toggleMode()">Mode: <span id='modeLabel'>Beginner</span></button>
+    <audio id="rollSound" src="ui_click_trimmed_soft_boosted.mp3"></audio>
+  </div>
 
-<div id="overlay">
-  <!-- Your challenge generator content goes here -->
-  <h1>UnderPressure Generator</h1>
-  <button onclick="alert('Rolling Dice...')">Generate Challenge</button>
-</div>
+  <script>
+    const drumPrompts = {
+      beginner: [
+        "Use a rimshot instead of a snare.",
+        "Reverse one part of your drum pattern.",
+        "No hi-hats — use texture instead.",
+        "Mute your kick for one bar mid-beat.",
+        "Switch snare placement every 2 bars.",
+        "Add vinyl crackle or tape hiss as a percussion layer.",
+        "Use only one-shots and no loops.",
+        "Make your drums mimic a heartbeat.",
+        "Create tension with pause-and-drop moments.",
+        "Use delay instead of reverb on all drum elements."
+      ],
+      advanced: [
+        "Design a fill using only foley.",
+        "Use 2 different 808s in one pattern.",
+        "Create a groove with no kicks.",
+        "Start the beat with a reversed clap.",
+        "Use only acoustic one-shots for drums.",
+        "Add swing by misaligning your hi-hats.",
+        "Use bitcrushing on only one element.",
+        "Record a live object tap as your main snare.",
+        "Make the snare ghost notes the emotional driver.",
+        "Pan every element manually to emulate a real room."
+      ]
+    };
 
+    const melodyPrompts = {
+      beginner: [
+        "Make a 3-chord loop that feels like giving up.",
+        "Only use one pad for your entire melody.",
+        "Make a melody with just 4 notes total.",
+        "Create a melody that loops endlessly.",
+        "Use only one-shots to make your loop.",
+        "Draw your melody with only white keys.",
+        "Create a melody that gets quieter every 2 bars.",
+        "Layer your lead with a reversed version of itself.",
+        "Start your melody with a long note then stabs.",
+        "Only use bell or mallet sounds."
+      ],
+      advanced: [
+        "Create a melody that hides fear or longing.",
+        "Use automation to evolve a single tone.",
+        "Use two different scales in one loop.",
+        "Write a melody with different sounds per note.",
+        "Use dissonance, then resolve subtly.",
+        "Turn random ambiance into harmony.",
+        "Use velocity to imply emotion like regret.",
+        "Write a melody backwards and flip it.",
+        "Make your chords ambiguous (no root).",
+        "Use silence to make notes more meaningful."
+      ]
+    };
+
+    let mode = "beginner";
+    let usedDrum = [], usedMelody = [];
+
+    function getUniquePrompt(set, used) {
+      if (used.length === set.length) used.length = 0;
+      let choice;
+      do {
+        choice = set[Math.floor(Math.random() * set.length)];
+      } while (used.includes(choice) && used.length < set.length);
+      used.push(choice);
+      return choice;
+    }
+
+    function roll() {
+      const drum = getUniquePrompt(drumPrompts[mode], usedDrum);
+      const melody = getUniquePrompt(melodyPrompts[mode], usedMelody);
+
+      document.getElementById("drumPrompt").textContent = "🥁 " + drum;
+      document.getElementById("melodyPrompt").textContent = "🎹 " + melody;
+
+      const sound = document.getElementById("rollSound");
+      sound.currentTime = 0;
+      sound.volume = 0.1;
+      sound.play();
+    }
+
+    function toggleMode() {
+      mode = (mode === "beginner") ? "advanced" : "beginner";
+      document.getElementById("modeLabel").textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+    }
+  </script>
 </body>
 </html>
