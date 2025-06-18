@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <meta charset="UTF-8">
+  <title>UnderPressure Challenge Generator</title>
+  <style>
+    html, body {
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      touch-action: manipulation;
+
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Courier New', Courier, monospace;
+      background: black url('100.gif') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+    .container {
+      max-width: 90vw;
+      width: 400px;
+      padding: 25px 35px;
+      height: auto;
+
+      background: rgba(0, 0, 0, 0.75);
+      border: 2px solid #ccc;
+      border-radius: 15px;
+      padding: 20px 30px;
+      width: 350px;
+      color: #fff;
+      box-shadow: 0 0 30px #222;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.1em;
+      color: #ccc;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px #444;
+    }
+    .prompt {
+      margin: 10px 0;
+      font-size: 0.9em;
+    }
+    button {
+      background: #111;
+      border: 1px solid #666;
+      padding: 6px 16px;
+      border-radius: 6px;
+      color: #ccc;
+      font-size: 0.8em;
+      margin: 10px 5px 0;
+      cursor: pointer;
+      box-shadow: 0 0 4px #222;
+    }
+    button:hover {
+      background: #222;
+      border-color: #999;
+    }
+    #dice {
+      width: 50px;
+      margin: 10px auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎲 UnderPressure Challenge Generator</h1>
+    <img id="dice" src="giphy.gif" alt="Rolling Dice">
+    <div class="prompt" id="drumPrompt">🥁 Reverse one part of your drum pattern.</div>
+    <div class="prompt" id="melodyPrompt">🎹 Create a 3-chord loop that feels like giving up.</div>
+    <button onclick="roll()">Roll Dice</button>
+    <button onclick="toggleMode()">Mode: <span id='modeLabel'>Beginner</span></button>
+    <audio id="rollSound" src="ui_click_trimmed_soft_boosted.mp3"></audio>
+  </div>
+
+  <script>
+    const drumPrompts = {
+      beginner: [
+        "Use a rimshot instead of a snare.",
+        "Reverse one part of your drum pattern.",
+        "No hi-hats — use texture instead.",
+        "Mute your kick for one bar mid-beat.",
+        "Switch snare placement every 2 bars."
+      ],
+      advanced: [
+        "Design a fill using only foley.",
+        "Use 2 different 808s in one pattern.",
+        "Create a groove with no kicks.",
+        "Start the beat with a reversed clap.",
+        "Use only acoustic one-shots for drums."
+      ]
+    };
+
+    const melodyPrompts = {
+      beginner: [
+        "Make a 3-chord loop that feels like giving up.",
+        "Only use one pad for your entire melody.",
+        "Make a melody with just 4 notes total.",
+        "Create a melody that loops endlessly.",
+        "Use only one-shots to make your loop."
+      ],
+      advanced: [
+        "Create a melody that hides fear or longing.",
+        "Use automation to evolve a single tone.",
+        "Use two different scales in one loop.",
+        "Write a melody with different sounds per note.",
+        "Use dissonance, then resolve subtly."
+      ]
+    };
+
+    let mode = "beginner";
+
+    let usedDrum = [], usedMelody = [];
+
+    function getUniquePrompt(set, used, label) {
+      if (used.length === set.length) used.length = 0;
+      let choice;
+      do {
+        choice = set[Math.floor(Math.random() * set.length)];
+      } while (used.includes(choice) && used.length < set.length);
+      used.push(choice);
+      return choice;
+    }
+
+
+    function roll() {
+      const drum = drumPrompts[mode][Math.floor(Math.random() * drumPrompts[mode].length)];
+      const melody = melodyPrompts[mode][Math.floor(Math.random() * melodyPrompts[mode].length)];
+
+      document.getElementById("drumPrompt").textContent = "🥁 " + drum;
+      document.getElementById("melodyPrompt").textContent = "🎹 " + melody;
+
+      const dice = document.getElementById("dice");
+      dice.style.display = "block";
+
+      const sound = document.getElementById("rollSound");
+      sound.currentTime = 0;
+      sound.volume = 0.1;
+      sound.play();
+
+      setTimeout(() => {
+        dice.style.display = "none";
+      }, 1400);
+    }
+
+    function toggleMode() {
+      mode = (mode === "beginner") ? "advanced" : "beginner";
+      document.getElementById("modeLabel").textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+    }
+  </script>
+</body>
+</html>
